@@ -11,12 +11,14 @@ We will:
 
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass # cool way to write classes that only store data, like C-like structs
 import dataclasses
 import struct
 import random
+import socket
 random.seed(1)
 
+# CONSTANTS shrouded in enigma
 TYPE_A = 1
 CLASS_IN = 1
 
@@ -40,7 +42,7 @@ class DNSQuestion:
 def header_to_bytes(header):
     fields = dataclasses.astuple(header) # converts the dataclass items into a tuple
     # there are 6 'H's because there are 6 fields
-    return struct.pack("!HHHHHH", fields) # here h is short int
+    return struct.pack("!HHHHHH", *fields) # * is used before fields to collect (and store in a tuple) and remove the excess fields
 
 def question_to_bytes(question):
     return question.name + struct.pack("!HH", question.type_, question.class_)
@@ -78,7 +80,7 @@ sock.sendto(query, ("8.8.8.8", 53)) # 8.8.8.8 is Google's DNS resolver
 
 # read the response. UDP DNS responses are usually less than 512 bytes
 # so reading 1024 bytes is enough
-response, _ = sock.recvform(1024)
+response, _ = sock.recvfrom(1024)
 
 
 
